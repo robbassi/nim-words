@@ -50,15 +50,16 @@ proc generateSentence(chain: Chain; maxLen: int = 100): string =
   var
     len = 0
     key = keys[idx]
-    sentence = key
+    sentence = key.strip
   while (chain.table.hasKey key) and (len < maxLen):
     let
       suffixes = chain.table[key]
       suffixesLen = suffixes.len
       suffixIdx = randomInt suffixesLen
-      suffix = suffixes[suffixIdx]
+      suffix = suffixes[suffixIdx].strip
       newKey = key.split(' ')[1] & ' ' & suffix
-    sentence.add ' ' & suffix
+    if suffix != "":
+      sentence.add ' ' & suffix
     key = newKey
     len += 3
   return sentence
