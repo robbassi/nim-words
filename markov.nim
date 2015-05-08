@@ -18,8 +18,9 @@ iterator words(filename: string): string =
     c = readChar(file)
     case c
     of ' ', '\t', '.', ',', ';':
-      yield word
-      word = ""
+      if word != "":
+        yield word
+        word = ""
     of 'a'..'z', 'A'..'Z', '0'..'9', '!':
       word.add c
     of '\l': discard
@@ -45,8 +46,7 @@ proc buildChain(filename: string): Chain =
 proc generateSentence(chain: Chain; maxLen: int = 100): string =
   let
     keys = chain.keys
-    keyLen = keys.len
-    idx = randomInt keyLen
+    idx = randomInt keys.len
   var
     len = 0
     key = keys[idx]
@@ -54,12 +54,10 @@ proc generateSentence(chain: Chain; maxLen: int = 100): string =
   while (chain.table.hasKey key) and (len < maxLen):
     let
       suffixes = chain.table[key]
-      suffixesLen = suffixes.len
-      suffixIdx = randomInt suffixesLen
+      suffixIdx = randomInt suffixes.len
       suffix = suffixes[suffixIdx].strip
       newKey = key.split(' ')[1] & ' ' & suffix
-    if suffix != "":
-      sentence.add ' ' & suffix
+    sentence.add ' ' & suffix
     key = newKey
     len += 3
   return sentence
@@ -68,4 +66,4 @@ proc generateSentence(chain: Chain; maxLen: int = 100): string =
 var chain = buildChain("source.txt")
 
 # generate a sentence (max 250 words)
-echo generateSentence(chain, maxLen = 250)
+echo generateSentence chain
