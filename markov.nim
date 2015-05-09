@@ -1,5 +1,4 @@
 # Reads a file and construct a 2 word prefix markov, which is then used to generate anew sentence.
-
 import random, tables, strutils
 
 # contains a table for prefix to suffix mapping, and
@@ -11,7 +10,7 @@ type Chain = object
 # iterate over all words in a file
 iterator words(filename: string): string =
   var
-    file = open(filename)
+    file = open filename
     word = ""
     c: char
   while not endOfFile file:
@@ -32,7 +31,7 @@ proc buildChain(filename: string): Chain =
   var
     chain = Chain(table: newTable[string, seq[string]](), keys: @[])
     prefix1, prefix2 = ""
-  for word in words(filename):
+  for word in words filename:
     let key = prefix1 & ' ' & prefix2
     if not chain.table.hasKey key:
       chain.table[key] = @[]
@@ -51,13 +50,15 @@ proc generateSentence(chain: Chain; maxLen: int = 100): string =
     len = 0
     key = keys[idx]
     sentence = key.strip
-  while (chain.table.hasKey key) and (len < maxLen):
+  while (chain.table.hasKey key) and
+        (len < maxLen):
     let
       suffixes = chain.table[key]
       suffixIdx = randomInt suffixes.len
-      suffix = suffixes[suffixIdx].strip
-      newKey = key.split(' ')[1] & ' ' & suffix
-    sentence.add ' ' & suffix
+      suffix = ' ' & suffixes[suffixIdx].strip
+      keyWords = key.split ' '
+      newKey = keyWords[1] & suffix
+    sentence.add suffix
     key = newKey
     len += 3
   return sentence
